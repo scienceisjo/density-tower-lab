@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>밀도 탑 가상 실험실 · 해누리중학교</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+:root{
+  --bg:#f4f6f9;
+  --paper:#ffffff;
+  --paper-shade:#f1f4f8;
+  --surface-2:#f7f9fc;
+  --ink:#18212f;
+  --ink-soft:#5a6677;
+  --ink-faint:#8a94a3;
+  --line:#e6eaf1;
+  --line-strong:#d4dae3;
+  --teal:#0e8a8f;
+  --teal-deep:#0a6166;
+  --teal-soft:#e4f3f3;
+  --coral:#ef6a4c;
+  --coral-soft:#fdece7;
+  --mustard:#dca234;
+  --amber-soft:#fbf2da;
+  --leaf:#3f9d6b;
+  --green-soft:#e7f5ed;
+  --rose:#d65a86;
+  --red:#e05647;
+  --red-soft:#fdebe9;
+  --grid:rgba(14,138,143,.05);
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow-sm:0 1px 2px rgba(20,30,50,.05), 0 1px 3px rgba(20,30,50,.04);
+  --shadow:0 2px 6px rgba(20,30,50,.05), 0 12px 28px -14px rgba(20,30,50,.14);
+  --font:'Pretendard','Noto Sans KR',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+body{
+  background:
+    radial-gradient(1200px 400px at 100% -5%, rgba(14,138,143,.06), transparent 60%),
+    radial-gradient(900px 360px at -5% 105%, rgba(239,106,76,.05), transparent 55%),
+    var(--bg);
+  min-height:100vh;line-height:1.6;
+}
+.app{max-width:1120px;margin:0 auto;padding:32px 24px 96px}
+
+/* header */
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{font-weight:800;font-size:24px;color:var(--ink);letter-spacing:-.6px}
+.brand-sub{color:var(--teal);font-size:13px;font-weight:600;background:var(--teal-soft);padding:4px 10px;border-radius:999px}
+.session-info{font-size:14px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.session-info b{color:var(--ink);font-weight:700}
+
+/* step indicator */
+.steps{display:flex;gap:8px;margin-bottom:28px}
+.step{flex:1;padding:12px 10px;text-align:center;border-radius:12px;background:var(--paper);border:1px solid var(--line);color:var(--ink-faint);transition:all .2s}
+.step.active{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 6px 16px -6px rgba(14,138,143,.5)}
+.step.done{background:var(--teal-soft);border-color:transparent;color:var(--teal-deep)}
+.step .num{display:block;font-weight:800;font-size:16px;line-height:1}
+.step .label{font-size:12px;margin-top:5px;display:block;font-weight:600}
+
+/* screens */
+.screen{display:none}
+.screen.active{display:block;animation:fade .35s cubic-bezier(.2,.7,.3,1)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* card */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:28px;margin-bottom:20px;box-shadow:var(--shadow)}
+.card h2{font-weight:800;font-size:20px;margin:0 0 6px;color:var(--ink);letter-spacing:-.3px}
+.card .hint{color:var(--ink-soft);font-size:14px;margin-bottom:18px;line-height:1.65}
+
+/* legacy login grid */
+.login-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.login-grid label{display:flex;flex-direction:column;font-size:13px;color:var(--ink-soft);font-weight:600;gap:6px}
+.login-grid input{border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface-2);font-family:inherit;font-size:16px;padding:10px 12px;color:var(--ink)}
+.login-grid input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);background:#fff}
+
+/* key login */
+.key-login{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.key-login input{border:1.5px solid var(--line-strong);border-radius:12px;background:var(--surface-2);font-size:24px;font-weight:700;letter-spacing:6px;padding:12px 18px;width:240px;text-align:center;text-transform:uppercase;color:var(--ink);font-feature-settings:"tnum"}
+.key-login input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px var(--teal-soft);background:#fff}
+.key-result{margin-top:14px;padding:14px 16px;font-size:15px;line-height:1.65;border-radius:12px;border:1px solid var(--line)}
+.key-result.ok{background:var(--green-soft);border-color:#bfe3cd;color:#216a44}
+.key-result.err{background:var(--red-soft);border-color:#f3c4bf;color:#a23624}
+
+/* buttons */
+.btn{background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-family:inherit;font-weight:700;font-size:15px;padding:12px 22px;cursor:pointer;transition:all .18s;box-shadow:0 4px 12px -4px rgba(14,138,143,.5)}
+.btn:hover{background:var(--teal-deep);transform:translateY(-1px);box-shadow:0 8px 18px -6px rgba(14,138,143,.55)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{background:#cfd6df;color:#fff;cursor:not-allowed;box-shadow:none;transform:none}
+.btn-secondary{background:#fff;color:var(--ink);border:1px solid var(--line-strong);box-shadow:var(--shadow-sm)}
+.btn-secondary:hover{background:var(--surface-2);border-color:var(--ink-faint)}
+.btn-coral{background:var(--coral);box-shadow:0 4px 12px -4px rgba(239,106,76,.5)}
+.btn-coral:hover{background:#e15334}
+.btn-small{padding:8px 14px;font-size:13px}
+
+/* notice */
+.notice{background:var(--teal-soft);border:1px solid #c7e6e6;border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:14px;line-height:1.7;color:var(--teal-deep)}
+.notice b{color:var(--teal-deep);font-weight:800}
+
+/* solubility */
+.sol-curve-wrap{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.sol-curve-title{font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;font-weight:700}
+canvas#solCurve{display:block;width:100%;max-width:340px;height:auto;background:#fff;border-radius:8px;border:1px solid var(--line)}
+.sol-status{font-size:13.5px;margin-top:8px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;line-height:1.55}
+.sol-status.safe{border-color:#bfe3cd;background:var(--green-soft);color:#216a44}
+.sol-status.near{border-color:#ecd9a3;background:var(--amber-soft);color:#7a5a14}
+.sol-status.over{border-color:#f3c4bf;background:var(--red-soft);color:#a23624}
+
+/* db pill */
+.db-pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;background:#eef1f5;color:var(--ink-soft)}
+.db-pill .dot{width:7px;height:7px;border-radius:50%;background:#aab3c0}
+.db-pill.online{background:var(--green-soft);color:#216a44}
+.db-pill.online .dot{background:var(--leaf);box-shadow:0 0 0 3px rgba(63,157,107,.2)}
+.db-pill.offline{background:var(--red-soft);color:#a23624}
+.db-pill.offline .dot{background:var(--red)}
+
+/* solution prep */
+.sol-stage{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
+@media(max-width:880px){.sol-stage{grid-template-columns:1fr}}
+.beaker-wrap{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.beaker-wrap h3{font-weight:700;margin:0;font-size:15px;color:var(--ink-soft)}
+canvas.beaker{display:block}
+.scale-readout{font-size:20px;background:#11161d;color:#5ef0c4;padding:8px 16px;letter-spacing:1px;font-weight:700;border-radius:8px;font-feature-settings:"tnum"}
+.controls-panel{display:flex;flex-direction:column;gap:16px}
+.tab-row{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line-strong);background:#fff;padding:9px 14px;cursor:pointer;border-radius:999px;font-weight:600;font-size:13.5px;display:flex;align-items:center;gap:8px;color:var(--ink-soft);transition:all .15s}
+.tab:hover{border-color:var(--teal)}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tab.done{background:var(--green-soft);color:#216a44;border-color:#bfe3cd}
+.tab .dot{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.input-row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.input-row label{display:flex;flex-direction:column;font-size:12px;color:var(--ink-soft);font-weight:600;gap:6px}
+.input-row input[type=number]{border:1px solid var(--line-strong);border-radius:10px;background:var(--surface-2);font-size:20px;font-weight:700;width:96px;padding:8px 10px;color:var(--ink);text-align:right;font-feature-settings:"tnum"}
+.input-row input[type=number]:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);background:#fff}
+.input-row .unit{font-size:14px;color:var(--ink-faint);padding-bottom:10px;font-weight:600}
+.color-pick{display:flex;gap:10px;flex-wrap:wrap}
+.color-pick button{width:34px;height:34px;border-radius:50%;border:2px solid #fff;cursor:pointer;padding:0;box-shadow:0 0 0 1px var(--line-strong), var(--shadow-sm);transition:transform .12s}
+.color-pick button:hover{transform:scale(1.08)}
+.color-pick button.selected{box-shadow:0 0 0 3px var(--teal)}
+.color-pick button:disabled{opacity:.25;cursor:not-allowed;transform:none}
+.calc-box{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.calc-box .k{color:var(--ink-soft);font-size:13px;font-weight:600}
+.calc-box .v{font-size:19px;color:var(--ink);font-weight:800;text-align:right;font-feature-settings:"tnum"}
+.calc-box .formula{grid-column:1/-1;font-size:12.5px;color:var(--ink-soft);padding-top:10px;border-top:1px solid var(--line);line-height:1.6}
+
+/* tower */
+.tower-stage{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
+@media(max-width:900px){.tower-stage{grid-template-columns:1fr}}
+.tower-canvas-wrap{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:center}
+canvas.tower{display:block;background:linear-gradient(180deg,#eef2f7,#e2e8f0);border-radius:10px}
+.tray{display:flex;flex-direction:column;gap:10px}
+.tray-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s}
+.tray-item:hover{border-color:var(--teal);box-shadow:var(--shadow-sm)}
+.tray-item.selected{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-soft)}
+.tray-item.used{opacity:.4;cursor:not-allowed}
+.tray-item .mini-beaker{width:32px;height:44px;border:2px solid var(--line-strong);border-top:none;position:relative;background:#fff;border-radius:0 0 7px 7px;flex-shrink:0;overflow:hidden}
+.tray-item .mini-fill{position:absolute;bottom:0;left:0;right:0}
+.tray-item .meta{flex:1;font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
+.tray-item .meta b{font-size:14px;color:var(--ink);font-weight:700}
+.pour-controls{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:8px}
+.pour-controls label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:8px;font-weight:600}
+.pour-controls input[type=range]{width:100%;accent-color:var(--teal)}
+.pour-controls .speed-readout{text-align:center;font-size:15px;color:var(--ink);margin-top:6px;font-weight:700}
+.pour-controls .help{font-size:11.5px;color:var(--ink-faint);margin-top:10px;line-height:1.6}
+
+/* result */
+.result-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px}
+.score-tile{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+.score-tile.primary{background:linear-gradient(180deg,var(--teal-soft),#fff);border-color:#c7e6e6}
+.score-tile .lbl{font-size:13px;color:var(--ink-soft);font-weight:700}
+.score-tile .v{font-size:44px;color:var(--teal-deep);font-weight:800;line-height:1.1;margin:6px 0;font-feature-settings:"tnum"}
+.score-tile .max{font-size:14px;color:var(--ink-faint);font-weight:600}
+.score-tile .reason{margin-top:10px;font-size:12.5px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);padding:8px 10px;border-radius:8px;line-height:1.55;text-align:left}
+.score-total{background:linear-gradient(135deg,var(--teal-deep),var(--teal));color:#fff;text-align:center;padding:24px;border-radius:14px}
+.score-total .big{font-size:44px;font-weight:800;line-height:1;font-feature-settings:"tnum"}
+.score-total .sub{font-size:13px;letter-spacing:.5px;margin-top:8px;opacity:.92;line-height:1.6}
+
+/* teacher */
+.teacher-bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.teacher-bar input{padding:9px 13px;border:1px solid var(--line-strong);border-radius:10px;font-family:inherit;background:var(--surface-2);font-size:14px}
+.teacher-bar input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-soft);background:#fff}
+table.results{width:100%;border-collapse:separate;border-spacing:0;background:#fff;font-size:13px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+table.results th, table.results td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+table.results th{background:var(--surface-2);color:var(--ink-soft);font-weight:700;border-bottom:1px solid var(--line-strong)}
+table.results tr:last-child td{border-bottom:none}
+table.results tbody tr:hover{background:var(--surface-2)}
+table.results .num{text-align:center;font-weight:600;font-feature-settings:"tnum"}
+table.results select{border:1px solid var(--line-strong);border-radius:8px;padding:4px 6px;font-family:inherit;font-size:12px;margin-top:4px;background:#fff}
+
+/* footer */
+.footer-bar{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:12px;flex-wrap:wrap}
+.tiny-link{font-size:13px;color:var(--ink-soft);text-decoration:none;font-weight:600;border-bottom:1px solid transparent}
+.tiny-link:hover{color:var(--teal)}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,35,.5);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.modal-bg.show{display:flex;animation:fade .2s}
+.modal{background:#fff;border-radius:18px;padding:28px;max-width:460px;width:100%;box-shadow:0 24px 60px -12px rgba(15,23,35,.4)}
+.modal h3{font-weight:800;color:var(--ink);margin:0 0 12px;font-size:19px}
+.modal #modal-body{font-size:14.5px;line-height:1.7;color:var(--ink-soft)}
+.modal .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+
+/* intro */
+.intro-block{margin:22px 0;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.intro-block:last-of-type{border-bottom:none;padding-bottom:0}
+.intro-block h3{font-weight:800;font-size:16px;color:var(--ink);margin:0 0 10px;display:flex;align-items:center;gap:9px;letter-spacing:-.2px}
+.intro-block h3::before{content:"";display:inline-block;width:4px;height:17px;border-radius:2px;background:var(--teal)}
+.intro-block p,.intro-block li{font-size:14px;line-height:1.75;color:var(--ink-soft);margin:5px 0}
+.intro-block ol,.intro-block ul{margin:8px 0 8px 4px;padding-left:20px}
+.intro-block b{color:var(--ink)}
+.intro-block .note{font-size:13px;color:var(--ink-soft);background:var(--amber-soft);border:1px solid #ecd9a3;border-radius:10px;padding:12px 14px;margin-top:12px;line-height:1.7}
+
+/* rubric */
+.rubric-wrap{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:8px}
+table.rubric{width:100%;border-collapse:separate;border-spacing:0;background:#fff;font-size:13px}
+table.rubric th,table.rubric td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+table.rubric tr:last-child td{border-bottom:none}
+table.rubric thead th{background:var(--ink);color:#fff;font-weight:700;font-size:12.5px}
+table.rubric td.area{font-weight:800;color:var(--ink);background:var(--surface-2);white-space:nowrap}
+table.rubric tr.app-row td{background:var(--teal-soft)}
+table.rubric tr.app-row td.area{background:#d3ebeb;color:var(--teal-deep)}
+table.rubric td.pts{font-weight:800;color:var(--ink);text-align:center;font-feature-settings:"tnum";white-space:nowrap}
+table.rubric .lvl{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:2px 8px;border-radius:999px;font-weight:800;font-size:11px;margin-right:7px;color:#fff}
+table.rubric .lvl.exc{background:var(--leaf)}
+table.rubric .lvl.mid{background:var(--mustard)}
+table.rubric .lvl.poor{background:var(--coral)}
+.eval-chip{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.eval-chip.app{background:var(--teal);color:#fff}
+.eval-chip.paper{background:#eef1f5;color:var(--ink-soft)}
+
+/* agree */
+.agree-line{display:flex;align-items:flex-start;gap:12px;background:var(--surface-2);padding:16px;border:1px solid var(--line-strong);border-radius:12px;cursor:pointer;font-size:14.5px;transition:all .15s;line-height:1.6}
+.agree-line:hover{border-color:var(--teal);background:var(--teal-soft)}
+.agree-line input[type=checkbox]{width:22px;height:22px;cursor:pointer;flex-shrink:0;margin-top:1px;accent-color:var(--teal)}
+
+/* badge */
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.badge.exc{background:var(--green-soft);color:#216a44}
+.badge.mid{background:var(--amber-soft);color:#7a5a14}
+.badge.poor{background:var(--red-soft);color:#a23624}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="brand">
+      <div class="brand-mark">밀도 탑 가상 실험실</div>
+      <div class="brand-sub">Density Tower · 해누리중학교 과학</div>
+    </div>
+    <div class="session-info" id="sessionInfo"><span id="sessionStudent"></span><span class="db-pill" id="dbPill"><span class="dot"></span><span id="dbPillText">초기화 중…</span></span></div>
+  </div>
+
+  <div class="steps" id="steps">
+    <div class="step active" data-step="intro"><span class="num">1</span><span class="label">안내 · 로그인</span></div>
+    <div class="step" data-step="prepare"><span class="num">2</span><span class="label">용액 제조</span></div>
+    <div class="step" data-step="tower"><span class="num">3</span><span class="label">밀도 탑 쌓기</span></div>
+    <div class="step" data-step="result"><span class="num">4</span><span class="label">제출 · 결과</span></div>
+  </div>
+
+  <!-- ===== Screen 1: Intro ===== -->
+  <section class="screen active" id="screen-intro">
+    <div class="card">
+      <h2>밀도 탑 가상 실험실에 오신 것을 환영합니다</h2>
+
+      <div class="intro-block">
+        <h3>이 실험은 무엇인가요?</h3>
+        <p>설탕물 <b>4가지</b>를 직접 만들고, 컵에 차례로 부어 <b>밀도 탑</b>을 쌓는 가상 실험입니다.
+        농도가 다른 용액은 밀도가 다르기 때문에 층이 분리되는 원리를 직접 확인합니다.
+        측정값은 학생이 직접 입력하고, 농도와 밀도는 자동으로 계산됩니다.</p>
+      </div>
+
+      <div class="intro-block">
+        <h3>실험 순서</h3>
+        <ol>
+          <li><b>용액 제조</b> — 물(용매)과 설탕(용질)의 질량을 정해 4가지 농도가 다른 설탕물을 만듭니다.</li>
+          <li><b>온도 · 용해도</b> — 용액 온도를 정하고, 설탕 용해도 곡선을 보며 <b>과포화가 되지 않게</b> 조절합니다.</li>
+          <li><b>밀도 탑 쌓기</b> — 4가지 용액을 컵에 차례로 따라 층을 만듭니다. 따르는 순서와 속도가 결과에 영향을 줍니다.</li>
+          <li><b>자동 채점 · 제출</b> — 결과가 자동으로 채점되어 저장됩니다.</li>
+        </ol>
+      </div>
+
+      <div class="intro-block">
+        <h3>평가 기준 (수행평가 총 15점)</h3>
+        <p style="margin-bottom:6px">아래는 이번 수행평가의 <b>전체 평가 기준(15점)</b>입니다.
+        이 중 <span class="eval-chip app">앱 자동채점</span> 표시된 <b>실험 수행 5점만</b> 이 웹앱에서 자동으로 채점됩니다.
+        나머지 <span class="eval-chip paper">종이 평가</span> 10점은 종이 시험지로 평가합니다.</p>
+        <div class="rubric-wrap">
+          <table class="rubric">
+            <thead>
+              <tr><th style="width:15%">평가 항목</th><th style="width:17%">채점 요소</th><th>평가 척도</th><th style="width:9%">배점</th></tr>
+            </thead>
+            <tbody>
+              <tr class="app-row">
+                <td class="area">실험 수행<br><span class="eval-chip app">앱 자동채점</span></td>
+                <td>밀도 탑 쌓기</td>
+                <td>
+                  <div><span class="lvl exc">5</span>설탕물의 농도 차이를 이용해 색깔이 섞이지 않은 4단의 밀도 탑을 명확하게 완성함</div>
+                  <div><span class="lvl mid">3</span>밀도 탑을 쌓았으나, 층의 경계가 다소 흐릿하거나 일부 섞여서 3단 이하의 층만 구분됨</div>
+                  <div><span class="lvl poor">1</span>층이 모두 섞여버려 밀도 탑의 형태를 확인하기 어렵거나 1단의 상태임</div>
+                </td>
+                <td class="pts">5</td>
+              </tr>
+              <tr>
+                <td class="area">실험 결과 분석<br><span class="eval-chip paper">종이 평가</span></td>
+                <td>밀도 탑 결과 분석</td>
+                <td>
+                  <div><span class="lvl exc">2</span>물질의 밀도 차이에 의해 층이 분리됨을 설명함</div>
+                  <div><span class="lvl poor">1</span>층이 분리되는 원리를 언급했으나 설명이 미흡함</div>
+                </td>
+                <td class="pts">2</td>
+              </tr>
+              <tr>
+                <td class="area">실험 과정 설계<br><span class="eval-chip paper">종이 평가</span></td>
+                <td>혼합물의 분리 원리 분석</td>
+                <td>
+                  <div><span class="lvl exc">8</span>분리 원리를 3가지 이상의 물질 특성과 자료의 근거를 들어 모두 논리적으로 설명함</div>
+                  <div><span class="lvl exc">6</span>분리 원리를 2가지 이상의 물질 특성과 자료의 근거를 들어 논리적으로 설명함</div>
+                  <div><span class="lvl mid">4</span>분리 원리를 1가지 이상의 물질 특성과 자료의 근거를 들어 설명함</div>
+                  <div><span class="lvl poor">2</span>제시된 실험 과정의 분리 원리에 대한 설명을 시도함</div>
+                </td>
+                <td class="pts">8</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">
+          ※ 이 웹앱은 <b>실험 수행(밀도 탑 쌓기) 5점</b>만 자동 채점합니다.
+          <b>실험 결과 분석(2점)</b>과 <b>실험 과정 설계(8점)</b>, 합계 10점은 <b>종이 시험지</b>로 평가합니다.<br>
+          ※ 채점은 <b>입력한 값과 선택한 순서·속도</b>로 이루어지므로, 어떤 기기(스마트폰 / 태블릿 / PC)로 접속해도 결과에 차이가 없습니다.
+        </div>
+      </div>
+
+      <div class="intro-block">
+        <h3>유의사항</h3>
+        <ul>
+          <li>실험은 <b>1회만 가능</b>합니다. 제출 후 수정·재응시는 불가합니다(교사 승인 시만 가능).</li>
+          <li>중간에 브라우저를 닫아도 진행 상황은 자동 저장됩니다.</li>
+          <li><b>본인 고유키</b>로만 로그인되며, 로그인 후 본인 이름을 한 번 더 확인합니다.</li>
+        </ul>
+      </div>
+
+      <div class="intro-block">
+        <label class="agree-line" for="agree">
+          <input type="checkbox" id="agree" onchange="onAgreeChange()" />
+          <span>위 <b>실험 안내, 실험 순서, 평가 기준(전체 15점 중 앱 자동채점 5점), 유의사항</b>을 모두 읽고 이해했습니다.</span>
+        </label>
+      </div>
+
+      <div class="intro-block">
+        <h3>로그인 (고유키)</h3>
+        <p>선생님께 받은 <b>나만의 고유키</b>를 입력하고 <b>고유키 확인</b>을 누르세요.
+        본인 이름이 표시되면 확인 후 실험을 시작합니다.
+        <br><span style="color:var(--ink-soft);font-size:13px">※ 이름·번호가 아니라 고유키로 로그인하므로, 다른 친구가 내 이름으로 응시할 수 없습니다.</span></p>
+        <div class="key-login">
+          <input id="in-key" type="text" placeholder="예: K7M2QX" maxlength="14" autocomplete="off"
+            oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')verifyKey()" />
+          <button class="btn" id="btnVerify" disabled onclick="verifyKey()">동의 후 고유키 확인</button>
+        </div>
+        <div id="keyResult" class="key-result" style="display:none"></div>
+      </div>
+
+      <div class="footer-bar">
+        <a class="tiny-link" href="#teacher">교사용 대시보드 →</a>
+        <span style="font-size:12px;color:var(--ink-soft)">고유키를 잊었다면 선생님께 문의하세요.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Screen 2: Prepare ===== -->
+  <section class="screen" id="screen-prepare">
+    <div class="notice">
+      <b>활동 1.</b> 농도가 다른 <b>4가지 설탕물</b>을 직접 만들어보세요. 
+      각 용액은 <b>물(용매)과 설탕(용질)의 질량</b>을 직접 정하고, 식용색소로 색을 다르게 합니다. 
+      농도와 밀도는 자동으로 계산됩니다.
+      <br>· 농도(질량%) = 용질 ÷ (용질+용매) × 100 &nbsp; · 밀도 ≈ 1.000 + 0.004 × 농도(%)
+    </div>
+
+    <div class="card">
+      <h2 id="prepHeading">용액 1 제조 중</h2>
+      <div class="hint">물과 설탕의 질량을 g 단위로 측정해서 입력하세요. 한 가지 색을 골라 식용색소를 첨가합니다.</div>
+
+      <div class="tab-row" id="tabRow"></div>
+
+      <div class="sol-stage" style="margin-top:14px">
+        <div class="beaker-wrap">
+          <h3>전자저울 + 비커</h3>
+          <canvas class="beaker" id="prepCanvas" width="240" height="320"></canvas>
+          <div class="scale-readout" id="scaleReadout">0.0 g</div>
+        </div>
+
+        <div class="controls-panel">
+          <div class="input-row">
+            <label>물(용매) 질량
+              <input id="in-water" type="number" min="0" max="500" step="1" value="" placeholder="0" />
+            </label>
+            <span class="unit">g</span>
+            <label style="margin-left:8px">설탕(용질) 질량
+              <input id="in-sugar" type="number" min="0" max="500" step="1" value="" placeholder="0" />
+            </label>
+            <span class="unit">g</span>
+            <label style="margin-left:8px">용액 온도
+              <input id="in-temp" type="number" min="0" max="100" step="1" value="20" />
+            </label>
+            <span class="unit">℃</span>
+          </div>
+
+          <div>
+            <div style="font-size:13px;color:var(--ink-soft);margin-bottom:6px;font-weight:500">식용색소 선택 (4개 용액 모두 다른 색)</div>
+            <div class="color-pick" id="colorPick"></div>
+          </div>
+
+          <div class="sol-curve-wrap">
+            <div class="sol-curve-title">설탕(자당)의 용해도 곡선 — 100g 물에 녹는 설탕의 최대 질량</div>
+            <canvas id="solCurve" width="340" height="180"></canvas>
+            <div class="sol-status" id="solStatus">— 물·설탕·온도를 입력하면 현재 위치가 표시됩니다.</div>
+          </div>
+
+          <div class="calc-box">
+            <div class="k">총 질량</div><div class="v" id="calc-total">0 g</div>
+            <div class="k">농도</div><div class="v" id="calc-conc">0.00 %</div>
+            <div class="k">밀도</div><div class="v" id="calc-density">1.000 g/mL</div>
+            <div class="formula">· 농도가 같으면 4단 분리 불가 → 4개 용액의 농도를 <b>충분히 다르게</b>!<br>· <b>과포화 용액은 만들 수 없습니다</b> — 설탕이 다 안 녹으면 “용액 완성” 버튼이 잠깁니다.</div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-small" onclick="resetCurrentSolution()">이 용액 다시 만들기</button>
+            <button class="btn" id="btnSaveSol" onclick="saveCurrentSolution()">이 용액 완성</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span style="font-size:13px;color:var(--ink-soft)">완성된 용액: <b id="solCount">0</b> / 4</span>
+      <button class="btn btn-coral" id="btnGoTower" disabled onclick="goToTower()">4개 용액 완성 → 밀도 탑 쌓기 ▶</button>
+    </div>
+  </section>
+
+  <!-- ===== Screen 3: Tower ===== -->
+  <section class="screen" id="screen-tower">
+    <div class="notice">
+      <b>활동 2.</b> 만든 4가지 용액을 컵에 <b>하나씩 차례로</b> 따라 밀도 탑을 쌓습니다. 
+      따르는 속도가 빠르면 층이 섞이고, 천천히 따라야 깔끔하게 분리됩니다. 
+      <b>한 번 따른 용액은 다시 사용할 수 없습니다.</b>
+    </div>
+
+    <div class="tower-stage">
+      <div class="tower-canvas-wrap">
+        <canvas class="tower" id="towerCanvas" width="360" height="480"></canvas>
+        <div style="font-family:'Noto Sans KR',cursive;color:var(--ink-soft);margin-top:8px;font-size:14px" id="towerStatus">왼쪽에서 따를 용액을 선택하세요.</div>
+      </div>
+
+      <div>
+        <div class="tray" id="solTray"></div>
+        <div class="pour-controls">
+          <label>따르는 속도</label>
+          <input type="range" id="pourSpeed" min="1" max="5" value="2" />
+          <div class="speed-readout" id="speedReadout">2 · 천천히</div>
+          <button class="btn btn-coral" style="width:100%;margin-top:10px" id="btnPour" onclick="pourSelected()" disabled>선택한 용액 따르기</button>
+          <div class="help">· 무거운(밀도가 큰) 용액부터 따라야 잘 분리됩니다.<br>· 속도 1~2: 거의 안 섞임 · 4~5: 많이 섞임</div>
+        </div>
+        <button class="btn btn-secondary" style="width:100%;margin-top:10px" id="btnFinish" onclick="finishTower()" disabled>실험 종료 · 결과 제출 ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Screen Result ===== -->
+  <section class="screen" id="screen-result">
+    <div class="card">
+      <h2>채점 결과</h2>
+      <div class="hint">제출이 완료되었습니다. 아래 점수는 <b>이 앱이 자동 채점하는 실험 수행(밀도 탑 쌓기) 5점</b>이며, 교사 검토 후 최종 확정됩니다.</div>
+
+      <div class="result-grid">
+        <div class="score-tile primary">
+          <div class="lbl">실험 수행 · 밀도 탑 쌓기 (앱 자동채점)</div>
+          <div class="v"><span id="r-exp">-</span><span class="max"> / 5</span></div>
+          <div class="reason" id="r-exp-reason"></div>
+        </div>
+      </div>
+
+      <div class="score-total">
+        <div class="big"><span id="r-exp2">-</span> / 5점</div>
+        <div class="sub">수행평가 전체 15점 중 <b>실험 수행 5점</b>을 이 앱에서 자동 채점했습니다.<br>실험 결과 분석(2점) · 실험 과정 설계(8점), 합계 10점은 종이 시험지로 평가됩니다.</div>
+      </div>
+
+      <div class="score-tile" style="margin-top:16px;text-align:left">
+        <div class="lbl" style="margin-bottom:6px">실험 과정 진단 <span class="eval-chip paper">참고용 · 점수 미반영</span></div>
+        <div class="reason" id="r-man-reason" style="margin-top:0"></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:10px">
+        <a class="tiny-link" href="#teacher">교사용 대시보드 →</a>
+        <div style="font-size:13px;color:var(--ink-soft)">저장된 학생 ID: <b id="r-sid"></b></div>
+      </div>
+
+      <div class="result-thumb-wrap" style="margin-top:16px;display:flex;align-items:flex-start;gap:14px;border-top:1px solid var(--line);padding-top:16px">
+        <canvas id="resultThumb" width="180" height="240" style="border:1px solid var(--line);background:#eef2f7;border-radius:8px;flex-shrink:0"></canvas>
+        <div style="font-size:13px;line-height:1.7;color:var(--ink-soft)">
+          <b style="color:var(--ink)">내가 만든 밀도 탑</b><br>
+          이 이미지는 교사 대시보드에서도 확인 가능합니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Teacher Dashboard ===== -->
+  <section class="screen" id="screen-teacher">
+    <div class="card" id="teacherLogin">
+      <h2>교사 로그인</h2>
+      <div class="hint">선생님 비밀번호를 입력하세요. 비밀번호는 <b>서버에서만</b> 확인되며 이 페이지나 브라우저에 저장되지 않습니다.</div>
+      <div class="teacher-bar">
+        <input id="teacherPwInput" type="password" placeholder="교사 비밀번호" onkeydown="if(event.key==='Enter')teacherLogin()" />
+        <button class="btn btn-small" onclick="teacherLogin()">로그인</button>
+        <a class="tiny-link" href="#" onclick="location.hash='';return false;">← 학생 화면</a>
+      </div>
+      <div id="teacherLoginMsg" style="font-size:13px;color:var(--bad);margin-top:8px"></div>
+    </div>
+
+    <div id="teacherPanel" style="display:none">
+      <div class="card">
+        <h2>시험 시간창 제어</h2>
+        <div class="hint">예약된 <b>시간대 안</b> + <b>마스터 스위치 ON</b>일 때만 학생이 제출할 수 있습니다. 결석생은 아래 명단에서 개인 재응시를 허가하세요.</div>
+        <div class="teacher-bar">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="cfgIsOpen" onchange="saveWindowConfig()" /> <b>응시 허용 (마스터 스위치)</b>
+          </label>
+          <span id="cfgStatus" style="font-size:13px;color:var(--ink-soft)"></span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="results">
+            <thead><tr><th>응시 가능 시간대 (시작 → 종료)</th><th>관리</th></tr></thead>
+            <tbody id="windowsBody"></tbody>
+          </table>
+        </div>
+        <div class="teacher-bar" style="margin-top:10px;flex-wrap:wrap">
+          <input type="datetime-local" id="newWinStart" />
+          <span>→</span>
+          <input type="datetime-local" id="newWinEnd" />
+          <button class="btn btn-small" onclick="addWindow()">시간대 추가</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>학생 명단 · 제출 현황 · 재응시</h2>
+        <div class="hint">결석·사고로 미응시한 학생은 <b>재응시 허가</b>를 눌러 개인 마감 시각을 지정하세요. 그 학생만, 그 시각까지 닫힌 시간에도 응시할 수 있습니다.</div>
+        <div class="teacher-bar">
+          <input id="rosterFilterClass" placeholder="반으로 필터 (예: 3)" oninput="renderRoster()" />
+          <span id="rosterSummary" style="font-size:13px;color:var(--ink-soft)"></span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="results" id="rosterTable">
+            <thead><tr><th>학년</th><th>반</th><th>번호</th><th>이름</th><th>제출</th><th>점수</th><th>재응시 허가</th></tr></thead>
+            <tbody id="rosterBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>제출 결과 (서버 채점)</h2>
+        <div class="hint">서버가 채점·기록한 결과입니다. 제출 시각은 <b>서버 시각</b>이라 학생 PC 시계와 무관합니다. 점수 수정·CSV·삭제가 가능합니다.</div>
+        <div class="teacher-bar">
+          <input id="filterClass" placeholder="반으로 필터 (예: 3)" oninput="renderTeacher()" />
+          <input id="filterName" placeholder="이름 검색" oninput="renderTeacher()" />
+          <button class="btn btn-small" onclick="exportCSV()">CSV 내보내기</button>
+          <button class="btn btn-secondary btn-small" onclick="clearAll()">전체 삭제</button>
+          <a class="tiny-link" href="#" onclick="location.hash='';return false;">← 학생 화면</a>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="results" id="resultsTable">
+            <thead>
+              <tr>
+                <th>제출시각(서버)</th><th>학년</th><th>반</th><th>번호</th><th>이름</th>
+                <th>밀도탑(5/3/1)</th><th>최종/5</th>
+                <th>미리보기</th><th>채점 근거 · 진단</th><th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">알림</h3>
+    <div id="modal-body" style="line-height:1.6"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary btn-small" id="modal-cancel" onclick="closeModal(false)" style="display:none">취소</button>
+      <button class="btn btn-small" id="modal-ok" onclick="closeModal(true)">확인</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   밀도 탑 가상 실험실 — 핵심 로직
+   ============================================================ */
+
+// ── 서버 관문(Edge Function) 설정 ───────────────────────────
+// 모든 채점·검증·기록은 서버(Edge Function)가 합니다. 이 페이지는 입력값만 보냅니다.
+// 설정 방법(SECURE_SETUP.md 참고):
+//   1) Supabase 프로젝트의 URL 과 anon(publishable) 키를 아래에 채웁니다.
+//   2) 대시보드에 secure_schema.sql 실행 + exam 함수 배포(비밀번호 secret 설정).
+//   3) 저장 후 GitHub Pages에 올리면 끝.
+const API_CONFIG = {
+  url:     'https://YOUR-PROJECT.supabase.co',   // 프로젝트 URL
+  anonKey: 'YOUR_ANON_OR_PUBLISHABLE_KEY',       // 공개(anon) 키 — 노출돼도 안전(테이블은 RLS로 잠김)
+};
+const FN_URL = API_CONFIG.url.replace(/\/$/, '') + '/functions/v1/exam';
+
+// 서버 관문 호출 (학생·교사 공통)
+async function callApi(action, payload = {}) {
+  const res = await fetch(FN_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + API_CONFIG.anonKey,
+      'apikey': API_CONFIG.anonKey,
+    },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  let data = {};
+  try { data = await res.json(); } catch (_) {}
+  return { status: res.status, ...data };
+}
+
+// 교사 비밀번호는 메모리에만 보관(소스/스토리지에 저장하지 않음)
+let teacherPw = null;
+
+function updateDbPill() {
+  const pill = document.getElementById('dbPill');
+  const text = document.getElementById('dbPillText');
+  if (!pill) return;
+  const ready = API_CONFIG.url && !API_CONFIG.url.includes('YOUR-PROJECT');
+  pill.className = ready ? 'db-pill online' : 'db-pill offline';
+  text.textContent = ready ? '서버 채점 모드' : '서버 미설정';
+}
+
+// ── 설탕(자당)의 물에 대한 용해도 (g per 100g 물) ───────────
+// 출처: CRC Handbook / 일반 화학 데이터
+const SOLUBILITY_DATA = [
+  {T:0,   S:179.2},
+  {T:10,  S:190.5},
+  {T:20,  S:203.9},
+  {T:30,  S:219.5},
+  {T:40,  S:238.1},
+  {T:50,  S:260.4},
+  {T:60,  S:287.3},
+  {T:70,  S:320.5},
+  {T:80,  S:362.1},
+  {T:90,  S:415.7},
+  {T:100, S:487.2},
+];
+function solubilityAt(T) {
+  if (T <= 0) return SOLUBILITY_DATA[0].S;
+  if (T >= 100) return SOLUBILITY_DATA[SOLUBILITY_DATA.length-1].S;
+  for (let i = 0; i < SOLUBILITY_DATA.length - 1; i++) {
+    const a = SOLUBILITY_DATA[i], b = SOLUBILITY_DATA[i+1];
+    if (T >= a.T && T <= b.T) {
+      return a.S + (b.S - a.S) * ((T - a.T) / (b.T - a.T));
+    }
+  }
+  return 200;
+}
+
+// ── 상수 ─────────────────────────────────────────────────────
+const COLORS = [
+  {id:'red',    rgb:'#d4633b', name:'빨강'},
+  {id:'yellow', rgb:'#d9a93d', name:'노랑'},
+  {id:'green',  rgb:'#5a8a4b', name:'초록'},
+  {id:'blue',   rgb:'#2e6f9c', name:'파랑'},
+  {id:'purple', rgb:'#7a4b8a', name:'보라'},
+  {id:'pink',   rgb:'#c95577', name:'분홍'},
+];
+const STORAGE_RESULTS = 'haenuri_density_results';
+const STORAGE_SESSION = 'haenuri_density_session';
+const MAX_SOLUTIONS = 4;
+
+// ════════════════════════════════════════════════════════════
+//  학생 명단 · 고유키 (ROSTER)
+//  ─ 학생은 이 명단의 key로만 로그인할 수 있습니다.
+//  ─ 실제 명단으로 교체하세요. key는 서로 중복되지 않게 합니다.
+//  ─ 아래는 동작 확인용 예시 4명입니다.
+// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+//  학생 명단·고유키는 더 이상 이 파일에 없습니다.
+//  서버(roster 테이블)에만 존재하며, 키 확인은 Edge Function이 합니다.
+//  → "소스 보기"로 친구 키를 알아낼 수 없습니다.
+// ════════════════════════════════════════════════════════════
+
+// ── 상태 ─────────────────────────────────────────────────────
+let session = null;            // 현재 학생 + 진행 상태
+let currentSolIdx = 0;         // 제조 중인 용액 index (0~3)
+let selectedTrayIdx = null;    // 탑에서 선택된 용액 index
+let modalResolve = null;
+
+// 세션 기본 구조
+function newSession(student) {
+  return {
+    student,                       // {grade, class, number, name}
+    solutions: [],                 // [{idx, water, sugar, temperature, color, conc, density}]
+    cup: { layers: [], pours: [] },// 현재 컵 상태 + 따른 순서 로그
+    poured: [],                    // 따른 solution index 목록
+    submitted: false,
+    startedAt: new Date().toISOString(),
+  };
+}
+
+// ── 화면 전환 ────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('screen-'+name);
+  if (el) el.classList.add('active');
+
+  // step indicator
+  const steps = ['intro','prepare','tower','result'];
+  const idx = steps.indexOf(name);
+  document.querySelectorAll('#steps .step').forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if (idx >= 0) {
+      if (i < idx) s.classList.add('done');
+      if (i === idx) s.classList.add('active');
+    }
+  });
+}
+
+// ── 모달 ─────────────────────────────────────────────────────
+function showModal(title, body, opts={}) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-cancel').style.display = opts.cancel ? '' : 'none';
+  document.getElementById('modal').classList.add('show');
+  return new Promise(res => modalResolve = res);
+}
+function closeModal(ok) {
+  document.getElementById('modal').classList.remove('show');
+  if (modalResolve) modalResolve(ok); modalResolve = null;
+}
+
+// ── 동의 체크박스 → 고유키 확인 버튼 활성화 ───────────────
+function onAgreeChange() {
+  const agreed = document.getElementById('agree').checked;
+  const btn = document.getElementById('btnVerify');
+  btn.disabled = !agreed;
+  btn.textContent = agreed ? '고유키 확인 ▶' : '동의 후 고유키 확인';
+}
+
+// ── 고유키 로그인 (서버 검증) ────────────────────────────────
+let verifiedStudent = null;
+let verifiedKey = null;
+
+async function verifyKey() {
+  const box = document.getElementById('keyResult');
+  box.style.display = 'block';
+
+  if (!document.getElementById('agree').checked) {
+    box.className = 'key-result err';
+    box.innerHTML = '먼저 위 안내를 읽고 <b>동의 체크박스</b>를 선택하세요.';
+    verifiedStudent = null; return;
+  }
+  const key = (document.getElementById('in-key').value || '').trim().toUpperCase();
+  if (!key) {
+    box.className = 'key-result err';
+    box.innerHTML = '고유키를 입력하세요.';
+    verifiedStudent = null; return;
+  }
+
+  box.className = 'key-result';
+  box.innerHTML = '확인 중…';
+  let r;
+  try { r = await callApi('verify_key', { key }); }
+  catch (e) {
+    box.className = 'key-result err';
+    box.innerHTML = '서버에 연결할 수 없습니다. 잠시 후 다시 시도하거나 선생님께 문의하세요.';
+    return;
+  }
+
+  if (!r.found) {
+    box.className = 'key-result err';
+    box.innerHTML = '⚠ 일치하는 고유키가 없습니다. 대소문자는 구분하지 않습니다. 다시 확인하세요.';
+    verifiedStudent = null; return;
+  }
+  if (r.alreadySubmitted) {
+    box.className = 'key-result err';
+    box.innerHTML = `<b>${escapeHtml(r.name)}</b> 학생은 이미 제출했습니다. 이 실험은 1회만 가능합니다.`;
+    verifiedStudent = null; return;
+  }
+  if (!r.accessOpen) {
+    box.className = 'key-result err';
+    box.innerHTML = `<b>${escapeHtml(r.name)}</b> 학생 확인됨. 다만 <b>지금은 응시 시간이 아닙니다.</b><br>정해진 시간에 다시 시도하거나, 결석·사고 시 선생님께 재응시를 요청하세요.`;
+    verifiedStudent = null; return;
+  }
+
+  verifiedStudent = { grade: r.grade, class: r.class, number: r.number, name: r.name };
+  verifiedKey = key;
+  box.className = 'key-result ok';
+  box.innerHTML =
+    `✓ <b>${r.grade}학년 ${r.class}반 ${r.number}번 ${escapeHtml(r.name)}</b> 학생으로 확인되었습니다.<br>` +
+    `본인이 맞으면 아래 버튼을 누르세요. <b>본인이 아니면</b> 시작하지 말고 선생님께 알리세요.` +
+    `<div style="margin-top:10px"><button class="btn btn-coral" onclick="startExperiment()">${escapeHtml(r.name)} 학생 — 실험 시작 ▶</button></div>`;
+}
+
+async function startExperiment() {
+  if (!verifiedStudent) { await showModal('확인','먼저 고유키를 확인하세요.'); return; }
+  const stu = verifiedStudent;
+  session = newSession({grade:stu.grade, class:stu.class, number:stu.number, name:stu.name});
+  session.studentId = `${stu.grade}-${stu.class}-${stu.number}-${stu.name}`;
+  session.key = verifiedKey;
+  saveSession();
+  document.getElementById('sessionStudent').innerHTML =
+    `<b>${stu.grade}학년 ${stu.class}반 ${stu.number}번 ${escapeHtml(stu.name)}</b> 학생 `;
+  setupPrepareScreen();
+  showScreen('prepare');
+}
+
+// ── 세션 저장/복구 ───────────────────────────────────────────
+function saveSession(){ localStorage.setItem(STORAGE_SESSION, JSON.stringify(session)); }
+function clearSession(){ localStorage.removeItem(STORAGE_SESSION); }
+
+// ── 결과 데이터 (모두 서버 Edge Function 경유) ───────────────
+// 학생 제출은 doSubmit()에서 callApi('submit')로 처리합니다.
+// 아래는 교사 화면 전용 — 매 호출에 비밀번호(teacherPw)를 함께 보냅니다.
+
+async function teacherList() {
+  const r = await callApi('teacher_list', { password: teacherPw });
+  return r.ok ? (r.results || []) : [];
+}
+async function teacherRoster() {
+  const r = await callApi('teacher_roster', { password: teacherPw });
+  return r.ok ? (r.roster || []) : [];
+}
+async function teacherGetConfig() {
+  const r = await callApi('teacher_get_config', { password: teacherPw });
+  return r.ok ? r.config : null;
+}
+async function teacherAdjust(key, score) {
+  const r = await callApi('teacher_adjust', { password: teacherPw, key, score });
+  return !!r.ok;
+}
+async function teacherDelete(key) {
+  const r = await callApi('teacher_delete', { password: teacherPw, key });
+  return !!r.ok;
+}
+async function teacherDeleteAll() {
+  const r = await callApi('teacher_delete_all', { password: teacherPw });
+  return !!r.ok;
+}
+async function teacherGrantMakeup(key, untilIso) {
+  const r = await callApi('teacher_grant_makeup', { password: teacherPw, key, until: untilIso });
+  return !!r.ok;
+}
+async function teacherSetWindow(patch) {
+  const r = await callApi('teacher_set_window', { password: teacherPw, ...patch });
+  return !!r.ok;
+}
+
+// ============================================================
+//  Screen 2: 용액 제조
+// ============================================================
+
+function setupPrepareScreen() {
+  currentSolIdx = session.solutions.length; // 이어서 시작
+  if (currentSolIdx >= MAX_SOLUTIONS) currentSolIdx = MAX_SOLUTIONS - 1;
+  renderTabs();
+  renderColorPick();
+  resetInputsForCurrent();
+  drawPrepBeaker();
+  updateCalc();
+  updateSolCount();
+}
+
+function renderTabs() {
+  const row = document.getElementById('tabRow');
+  row.innerHTML = '';
+  for (let i=0; i<MAX_SOLUTIONS; i++) {
+    const sol = session.solutions[i];
+    const t = document.createElement('div');
+    t.className = 'tab' + (i===currentSolIdx?' active':'') + (sol?' done':'');
+    t.onclick = () => switchTab(i);
+    t.innerHTML = `<span class="dot" style="background:${sol?sol.color.rgb:'#fff'}"></span>용액 ${i+1}` +
+                  (sol?` <span style="color:#888">·${sol.conc.toFixed(1)}%</span>`:'');
+    row.appendChild(t);
+  }
+  document.getElementById('prepHeading').textContent =
+    `용액 ${currentSolIdx+1} 제조 중 ${session.solutions[currentSolIdx]?'(완성됨 — 수정하려면 “다시 만들기”)':''}`;
+}
+
+function switchTab(i) {
+  currentSolIdx = i;
+  renderTabs();
+  renderColorPick();
+  // 입력값 복구
+  const sol = session.solutions[i];
+  if (sol) {
+    document.getElementById('in-water').value = sol.water;
+    document.getElementById('in-sugar').value = sol.sugar;
+    document.getElementById('in-temp').value = sol.temperature ?? 20;
+  } else {
+    document.getElementById('in-water').value = '';
+    document.getElementById('in-sugar').value = '';
+    document.getElementById('in-temp').value = 20;
+  }
+  drawPrepBeaker();
+  updateCalc();
+}
+
+function renderColorPick() {
+  const used = new Set(session.solutions.map((s,i)=> i===currentSolIdx ? null : s.color.id).filter(Boolean));
+  const cur = session.solutions[currentSolIdx]?.color?.id;
+  const wrap = document.getElementById('colorPick');
+  wrap.innerHTML = '';
+  COLORS.forEach(c => {
+    const b = document.createElement('button');
+    b.style.background = c.rgb;
+    b.title = c.name;
+    if (used.has(c.id)) b.disabled = true;
+    if (cur === c.id) b.classList.add('selected');
+    b.onclick = () => {
+      session._pendingColor = c;
+      renderColorPick();
+      drawPrepBeaker();
+    };
+    wrap.appendChild(b);
+  });
+  if (cur && !session._pendingColor) {
+    session._pendingColor = COLORS.find(x=>x.id===cur);
+  }
+}
+
+function resetInputsForCurrent() {
+  const sol = session.solutions[currentSolIdx];
+  document.getElementById('in-water').value = sol?.water ?? '';
+  document.getElementById('in-sugar').value = sol?.sugar ?? '';
+  document.getElementById('in-temp').value = sol?.temperature ?? 20;
+  session._pendingColor = sol?.color ?? null;
+}
+
+function getInputs() {
+  const w = +document.getElementById('in-water').value || 0;
+  const s = +document.getElementById('in-sugar').value || 0;
+  const t = +document.getElementById('in-temp').value;
+  return {water:w, sugar:s, temp:isFinite(t)?t:20};
+}
+
+function calcSolution(water, sugar) {
+  const total = water + sugar;
+  const conc = total > 0 ? (sugar / total) * 100 : 0;
+  // 설탕물 밀도 근사식: ρ ≈ 1.000 + 0.0042 × c%
+  // 실제: 0%→1.000, 10%→1.038, 20%→1.080, 30%→1.127, 40%→1.176
+  const density = 1.000 + 0.0042 * conc;
+  return {total, conc, density};
+}
+
+// 용해도 상태 계산
+function solubilityStatus(water, sugar, temp) {
+  if (water <= 0 || sugar < 0) return {state:'empty', max:0, ratio:0};
+  const max = (solubilityAt(temp) / 100) * water;  // 현재 물 질량에 녹는 설탕 최대량
+  const ratio = sugar / Math.max(0.001, max);
+  if (sugar === 0) return {state:'empty', max, ratio:0};
+  if (ratio > 1) return {state:'over', max, ratio};
+  if (ratio > 0.85) return {state:'near', max, ratio};
+  return {state:'safe', max, ratio};
+}
+
+function updateCalc() {
+  const {water, sugar, temp} = getInputs();
+  const {total, conc, density} = calcSolution(water, sugar);
+  document.getElementById('calc-total').textContent = total.toFixed(0) + ' g';
+  document.getElementById('calc-conc').textContent = conc.toFixed(2) + ' %';
+  document.getElementById('calc-density').textContent = density.toFixed(3) + ' g/mL';
+  document.getElementById('scaleReadout').textContent = total.toFixed(1) + ' g';
+
+  // 용해도 상태
+  const ss = solubilityStatus(water, sugar, temp);
+  const statusEl = document.getElementById('solStatus');
+  const btnSave = document.getElementById('btnSaveSol');
+  if (statusEl) {
+    if (ss.state === 'empty') {
+      statusEl.innerHTML = '— 물·설탕·온도를 입력하면 현재 위치가 표시됩니다.';
+      statusEl.className = 'sol-status';
+      if (btnSave) btnSave.disabled = false;
+    } else if (ss.state === 'over') {
+      const excess = (sugar - ss.max);
+      statusEl.innerHTML =
+        `<b>⚠ 과포화 상태</b> · ${temp}℃에서 ${water}g의 물에는 설탕이 최대 <b>${ss.max.toFixed(1)}g</b>까지만 녹습니다. ` +
+        `현재 ${sugar}g 중 약 ${excess.toFixed(1)}g이 녹지 않습니다.<br>` +
+        `→ 설탕을 줄이거나 온도를 더 높이세요.`;
+      statusEl.className = 'sol-status over';
+      if (btnSave) btnSave.disabled = true;   // ← 과포화면 완성 불가
+    } else if (ss.state === 'near') {
+      statusEl.innerHTML =
+        `포화 직전 · ${temp}℃ 최대 ${ss.max.toFixed(1)}g 중 ${sugar}g (${(ss.ratio*100).toFixed(0)}%)`;
+      statusEl.className = 'sol-status near';
+      if (btnSave) btnSave.disabled = false;
+    } else {
+      statusEl.innerHTML =
+        `미포화 (안전) · ${temp}℃ 최대 ${ss.max.toFixed(1)}g 중 ${sugar}g 사용`;
+      statusEl.className = 'sol-status safe';
+      if (btnSave) btnSave.disabled = false;
+    }
+  }
+
+  drawSolubilityCurve(temp, water, sugar);
+  drawPrepBeaker();
+}
+
+document.addEventListener('input', e=>{
+  if (e.target.id==='in-water' || e.target.id==='in-sugar' || e.target.id==='in-temp') updateCalc();
+});
+
+function drawPrepBeaker() {
+  const c = document.getElementById('prepCanvas');
+  const ctx = c.getContext('2d');
+  const W=c.width, H=c.height;
+  ctx.clearRect(0,0,W,H);
+
+  // 저울 받침
+  ctx.fillStyle = '#1d2b3a';
+  ctx.fillRect(20, H-30, W-40, 16);
+  ctx.fillStyle = '#445566';
+  ctx.fillRect(40, H-14, W-80, 10);
+
+  // 비커
+  const bx=40, by=40, bw=W-80, bh=H-90;
+  ctx.strokeStyle='#1d2b3a'; ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(bx, by);
+  ctx.lineTo(bx, by+bh);
+  ctx.lineTo(bx+bw, by+bh);
+  ctx.lineTo(bx+bw, by);
+  ctx.stroke();
+  // 주둥이
+  ctx.beginPath();
+  ctx.moveTo(bx, by);
+  ctx.lineTo(bx-12, by+8);
+  ctx.stroke();
+
+  // 눈금
+  ctx.strokeStyle='#445566'; ctx.lineWidth=1;
+  ctx.font="11px 'Noto Sans KR', sans-serif";
+  ctx.fillStyle='#445566';
+  for (let i=1; i<=5; i++) {
+    const y = by + bh - (i/5)*bh;
+    ctx.beginPath();
+    ctx.moveTo(bx+4, y); ctx.lineTo(bx+16, y); ctx.stroke();
+    ctx.fillText((i*50)+'mL', bx+20, y+4);
+  }
+
+  // 내용물
+  const {water, sugar} = getInputs();
+  const total = water + sugar;
+  if (total > 0) {
+    const fillFrac = Math.min(1, total / 250);
+    const fillH = fillFrac * (bh-12);
+    const col = session._pendingColor;
+    if (col) {
+      // 색이 있으면 색으로
+      ctx.fillStyle = hexToRgba(col.rgb, .75);
+    } else if (sugar === 0) {
+      ctx.fillStyle = 'rgba(180,210,230,.6)';  // 맑은 물
+    } else {
+      ctx.fillStyle = 'rgba(230,220,180,.7)';  // 설탕만 들어가면 약간 누런 톤
+    }
+    ctx.fillRect(bx+2, by+bh-fillH-2, bw-4, fillH);
+
+    // 윗면 광택
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    ctx.fillRect(bx+2, by+bh-fillH-2, bw-4, 4);
+
+    // 설탕 결정 표시
+    if (sugar > 0) {
+      ctx.fillStyle = 'rgba(255,255,255,.85)';
+      const n = Math.min(40, Math.floor(sugar/2));
+      // 결정 위치를 안정적으로 (seedrandom 효과)
+      for (let i=0; i<n; i++) {
+        const rx = bx+6 + ((i*37) % (bw-12));
+        const ry = by + bh - fillH + 4 + ((i*53) % Math.max(8, fillH-8));
+        ctx.fillRect(rx, ry, 2, 2);
+      }
+    }
+  }
+
+  // 라벨
+  ctx.font="bold 13px 'Noto Serif KR'";
+  ctx.fillStyle='#0a6166';
+  ctx.fillText(`용액 ${currentSolIdx+1}`, bx, by-12);
+
+  // 온도 시각화 — 증기 (40℃ 이상부터, 강도는 온도에 비례)
+  const {temp} = getInputs();
+  if (temp >= 40 && total > 0) {
+    const intensity = Math.min(1, (temp - 40) / 60);
+    ctx.fillStyle = `rgba(200,200,210,${0.25 + 0.4*intensity})`;
+    const now = Date.now() * 0.001;
+    for (let i = 0; i < 5; i++) {
+      const phase = now + i * 1.2;
+      const sx = bx + bw/2 + Math.sin(phase) * 18 + (i-2)*10;
+      const sy = by - 8 - ((phase*15) % 30);
+      const r = 4 + Math.sin(phase*2) * 2 + intensity*3;
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // 온도 텍스트 (비커 옆)
+  ctx.font="bold 12px 'Noto Sans KR'";
+  ctx.fillStyle = temp >= 60 ? '#d4633b' : temp <= 10 ? '#2e6f9c' : '#445566';
+  ctx.fillText(`${temp}℃`, bx+bw+4, by+12);
+}
+
+/* ── 용해도 곡선 그리기 ──────────────────────────────────── */
+function drawSolubilityCurve(temp, water, sugar) {
+  const c = document.getElementById('solCurve');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  const W = c.width, H = c.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const PAD_L = 36, PAD_R = 12, PAD_T = 18, PAD_B = 26;
+  const PLOT_W = W - PAD_L - PAD_R;
+  const PLOT_H = H - PAD_T - PAD_B;
+  const xMax = 100, yMax = 500;
+  const x2px = x => PAD_L + (x / xMax) * PLOT_W;
+  const y2px = y => PAD_T + PLOT_H - (y / yMax) * PLOT_H;
+
+  // 미포화 영역 (곡선 아래) — 옅은 초록
+  ctx.fillStyle = 'rgba(90,138,75,.12)';
+  ctx.beginPath();
+  ctx.moveTo(x2px(0), y2px(0));
+  for (let T = 0; T <= 100; T += 2) ctx.lineTo(x2px(T), y2px(solubilityAt(T)));
+  ctx.lineTo(x2px(100), y2px(0));
+  ctx.closePath();
+  ctx.fill();
+
+  // 과포화 영역 (곡선 위) — 옅은 빨강
+  ctx.fillStyle = 'rgba(212,99,59,.10)';
+  ctx.beginPath();
+  ctx.moveTo(x2px(0), y2px(yMax));
+  for (let T = 0; T <= 100; T += 2) ctx.lineTo(x2px(T), y2px(solubilityAt(T)));
+  ctx.lineTo(x2px(100), y2px(yMax));
+  ctx.closePath();
+  ctx.fill();
+
+  // 격자
+  ctx.strokeStyle = 'rgba(70,55,30,.18)'; ctx.lineWidth = 1;
+  ctx.fillStyle = '#445566';
+  ctx.font = "10px 'Noto Sans KR', sans-serif";
+  for (let x = 0; x <= 100; x += 20) {
+    ctx.beginPath(); ctx.moveTo(x2px(x), PAD_T); ctx.lineTo(x2px(x), PAD_T+PLOT_H); ctx.stroke();
+    ctx.fillText(x + '℃', x2px(x) - 9, H - 8);
+  }
+  for (let y = 0; y <= 500; y += 100) {
+    ctx.beginPath(); ctx.moveTo(PAD_L, y2px(y)); ctx.lineTo(PAD_L+PLOT_W, y2px(y)); ctx.stroke();
+    ctx.fillText(String(y), 4, y2px(y) + 4);
+  }
+
+  // 곡선
+  ctx.strokeStyle = '#0a6166'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let T = 0; T <= 100; T += 1) {
+    const y = solubilityAt(T);
+    if (T === 0) ctx.moveTo(x2px(T), y2px(y));
+    else ctx.lineTo(x2px(T), y2px(y));
+  }
+  ctx.stroke();
+
+  // 영역 라벨
+  ctx.font = "bold 11px 'Noto Sans KR'";
+  ctx.fillStyle = 'rgba(90,138,75,.85)';
+  ctx.fillText('미포화 (OK)', x2px(8), y2px(40));
+  ctx.fillStyle = 'rgba(212,99,59,.8)';
+  ctx.fillText('과포화 (불가)', x2px(55), y2px(460));
+
+  // 축 라벨
+  ctx.fillStyle = '#0a6166';
+  ctx.font = "bold 10px 'Noto Sans KR'";
+  ctx.fillText('g 설탕/100g 물', 4, 12);
+
+  // 현재 점
+  if (water > 0 && sugar >= 0 && temp >= 0 && temp <= 100) {
+    const yVal = (sugar / water) * 100;
+    if (yVal <= yMax + 20) {
+      const px = x2px(temp), py = y2px(Math.min(yVal, yMax + 10));
+      const ss = solubilityStatus(water, sugar, temp);
+      const color = ss.state === 'over' ? '#d4633b' :
+                    ss.state === 'near' ? '#d9a93d' : '#0f6e7a';
+      // 수직선 (현재 온도에서 곡선까지)
+      ctx.strokeStyle = 'rgba(70,55,30,.4)'; ctx.setLineDash([3,3]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(px, PAD_T+PLOT_H); ctx.lineTo(px, py); ctx.stroke();
+      ctx.setLineDash([]);
+      // 점
+      ctx.fillStyle = color;
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(px, py, 6.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      // 값 표시
+      ctx.fillStyle = '#1d2b3a';
+      ctx.font = "bold 11px 'Noto Sans KR'";
+      ctx.fillText(`${yVal.toFixed(0)}g/100g`, Math.min(px+10, W-70), Math.max(py-6, PAD_T+10));
+    }
+  }
+}
+
+function hexToRgba(hex, a) {
+  const m = hex.replace('#','');
+  const r = parseInt(m.substr(0,2),16);
+  const g = parseInt(m.substr(2,2),16);
+  const b = parseInt(m.substr(4,2),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+async function saveCurrentSolution() {
+  const {water, sugar, temp} = getInputs();
+  if (water <= 0) { await showModal('확인','물(용매)을 1g 이상 넣어주세요.'); return; }
+  if (sugar < 0) return;
+  if (!session._pendingColor) { await showModal('확인','식용색소 색을 선택하세요.'); return; }
+  if (temp < 0 || temp > 100) { await showModal('확인','용액 온도는 0℃~100℃ 사이로 입력하세요.'); return; }
+
+  // 과포화 검사
+  const ss = solubilityStatus(water, sugar, temp);
+  if (ss.state === 'over') {
+    await showModal('과포화 용액은 만들 수 없습니다',
+      `${temp}℃에서 ${water}g의 물에는 설탕이 <b>최대 ${ss.max.toFixed(1)}g</b>까지만 녹습니다.<br>` +
+      `현재 ${sugar}g 중 약 ${(sugar - ss.max).toFixed(1)}g이 녹지 않고 남게 됩니다.<br><br>` +
+      `· 설탕을 줄이거나<br>· 온도를 더 높여 다시 시도하세요.`);
+    return;
+  }
+
+  // 색 중복 검사
+  const dup = session.solutions.find((s,i)=> i!==currentSolIdx && s.color.id===session._pendingColor.id);
+  if (dup) { await showModal('색 중복', `해당 색은 이미 용액 ${session.solutions.indexOf(dup)+1}에서 사용 중입니다. 다른 색을 선택하세요.`); return; }
+
+  const {conc, density} = calcSolution(water, sugar);
+  session.solutions[currentSolIdx] = {
+    idx: currentSolIdx,
+    water, sugar, temperature: temp,
+    color: session._pendingColor,
+    conc, density,
+  };
+  session._pendingColor = null;
+  saveSession();
+  updateSolCount();
+
+  // 다음 용액으로 자동 이동
+  let next = currentSolIdx + 1;
+  while (next < MAX_SOLUTIONS && session.solutions[next]) next++;
+  if (next < MAX_SOLUTIONS) {
+    currentSolIdx = next;
+  }
+  setupPrepareScreen();
+}
+
+function resetCurrentSolution() {
+  session.solutions[currentSolIdx] = undefined;
+  // 배열 hole 처리
+  session.solutions = session.solutions.filter(Boolean);
+  session._pendingColor = null;
+  saveSession();
+  setupPrepareScreen();
+}
+
+function updateSolCount() {
+  const n = session.solutions.filter(Boolean).length;
+  document.getElementById('solCount').textContent = n;
+  document.getElementById('btnGoTower').disabled = (n < MAX_SOLUTIONS);
+}
+
+async function goToTower() {
+  if (session.solutions.length < MAX_SOLUTIONS) return;
+  // 농도가 모두 같으면 경고
+  const concs = session.solutions.map(s=>s.conc);
+  const range = Math.max(...concs) - Math.min(...concs);
+  if (range < 5) {
+    const ok = await showModal('농도 차이 부족',
+      `4개 용액의 농도 차이가 작습니다(최대-최소 = ${range.toFixed(1)}%). ` +
+      '이대로 진행하면 층 분리가 어려울 수 있습니다. 그래도 진행할까요?',
+      {cancel:true});
+    if (!ok) return;
+  }
+  setupTowerScreen();
+  showScreen('tower');
+}
+
+// ============================================================
+//  Screen 3: 밀도 탑
+// ============================================================
+
+function setupTowerScreen() {
+  selectedTrayIdx = null;
+  if (session.cup.layers.length === 0 && !session.poured.length) {
+    // 새로 시작
+  }
+  renderTray();
+  drawTower();
+  updatePourBtn();
+  document.getElementById('btnFinish').disabled = session.poured.length === 0;
+}
+
+function renderTray() {
+  const tray = document.getElementById('solTray');
+  tray.innerHTML = '';
+  // 밀도 큰 순으로 보여주면 학생이 더 잘 구분
+  const display = session.solutions.map((s,i)=>({...s, oi:i}));
+  display.forEach(s => {
+    const used = session.poured.includes(s.oi);
+    const div = document.createElement('div');
+    div.className = 'tray-item' + (used?' used':'') + (selectedTrayIdx===s.oi?' selected':'');
+    div.onclick = () => { if (used) return; selectedTrayIdx = s.oi; renderTray(); updatePourBtn(); };
+    div.innerHTML = `
+      <div class="mini-beaker"><div class="mini-fill" style="height:70%;background:${s.color.rgb}"></div></div>
+      <div class="meta">
+        <b>용액 ${s.oi+1}</b><br>
+        <span style="color:#666">물 ${s.water}g + 설탕 ${s.sugar}g · ${s.temperature ?? 20}℃</span><br>
+        <span style="color:#0a6166">농도 ${s.conc.toFixed(1)}% · 밀도 ${s.density.toFixed(3)} g/mL</span>
+      </div>
+    `;
+    tray.appendChild(div);
+  });
+}
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'pourSpeed') {
+    const v = +e.target.value;
+    const labels = ['','매우 천천히','천천히','보통','빠르게','매우 빠르게'];
+    document.getElementById('speedReadout').textContent = `${v} · ${labels[v]}`;
+  }
+});
+
+function updatePourBtn() {
+  document.getElementById('btnPour').disabled = (selectedTrayIdx === null);
+}
+
+// 밀도 탑 시뮬레이션 ─────────────────────────────────────────
+// 컵 = layers 배열, 각 layer = {color, density, height, purity}
+// 새 용액을 부으면:
+//   - 부피 = 50mL 가정 (학생이 만든 양과 무관 — 단순화)
+//   - pour quality = f(speed, densityDiff)
+//   - quality에 따라 깨끗한 층 / 부분 혼합 / 완전 혼합
+function pourSelected() {
+  if (selectedTrayIdx === null) return;
+  const sol = session.solutions[selectedTrayIdx];
+  if (!sol) return;
+  const speed = +document.getElementById('pourSpeed').value;
+
+  // 현재 컵 맨 위 (또는 위치할 자리의 인접 층) 의 밀도
+  const layers = session.cup.layers;
+  // 위치 결정: 밀도가 큰 쪽이 아래 — 새 용액의 정렬 위치 찾기
+  // 밀도가 같으면 마지막에 부어진 것이 위(자연스러운 결과)
+  let insertAt = layers.length;
+  for (let i = layers.length - 1; i >= 0; i--) {
+    if (sol.density > layers[i].density) {
+      insertAt = i; // 그 층보다 더 무거우면 그 층 밑에 들어감
+    } else {
+      break;
+    }
+  }
+  // 인접한 층(섞일 대상)을 찾기
+  const neighbor = layers[insertAt] || layers[insertAt-1];
+  const densityDiff = neighbor ? Math.abs(sol.density - neighbor.density) : 0.1;
+
+  // mixing factor 계산
+  // speed: 1~5, densityDiff: 0~0.2 (현실적 범위)
+  // diff가 크면 분리 잘 됨, speed가 크면 섞임
+  let mixing = (speed - 1) * 0.15 + Math.max(0, (0.04 - densityDiff)) * 4;
+  // 위에서 따랐는데 더 무거운 경우 (밑으로 가라앉아야 하는 경우)
+  // → 자연스럽게 더 많이 섞임
+  if (layers.length > 0 && sol.density > layers[layers.length-1].density) {
+    mixing += 0.25; // 패널티
+  }
+  mixing = Math.max(0, Math.min(1, mixing));
+
+  // 새 층 생성
+  const newLayer = {
+    color: sol.color.rgb,
+    density: sol.density,
+    height: 50,     // mL 단위 (시각적 비례)
+    purity: 1 - mixing,
+    solIdx: sol.idx,
+  };
+
+  if (mixing < 0.3) {
+    // 깨끗한 층 — 밀도 위치에 삽입
+    layers.splice(insertAt, 0, newLayer);
+  } else if (mixing < 0.7) {
+    // 부분 혼합 — 인접 층과 색 섞임, 두 층 purity 모두 감소
+    layers.splice(insertAt, 0, newLayer);
+    const idx = insertAt;
+    if (layers[idx-1]) {
+      layers[idx-1].purity = Math.min(layers[idx-1].purity, 1 - mixing * 0.7);
+      layers[idx-1].color = blendColor(layers[idx-1].color, newLayer.color, 0.3);
+    }
+    if (layers[idx+1]) {
+      layers[idx+1].purity = Math.min(layers[idx+1].purity, 1 - mixing * 0.7);
+      layers[idx+1].color = blendColor(layers[idx+1].color, newLayer.color, 0.3);
+    }
+    newLayer.purity = Math.min(newLayer.purity, 0.5);
+  } else {
+    // 완전 혼합 — 모든 층과 섞이는 진흙탕 (시각적: 갈색 톤으로 통합)
+    if (layers.length === 0) {
+      layers.push(newLayer);
+    } else {
+      // 모든 층을 하나로 합치고 평균 색 + purity 매우 낮음
+      let avgR=0, avgG=0, avgB=0, totalH=0;
+      layers.forEach(l => {
+        const rgb = parseHex(l.color);
+        avgR += rgb.r * l.height; avgG += rgb.g * l.height; avgB += rgb.b * l.height;
+        totalH += l.height;
+      });
+      const newRgb = parseHex(newLayer.color);
+      avgR += newRgb.r * newLayer.height; avgG += newRgb.g * newLayer.height; avgB += newRgb.b * newLayer.height;
+      totalH += newLayer.height;
+      const merged = {
+        color: `rgb(${Math.round(avgR/totalH)},${Math.round(avgG/totalH)},${Math.round(avgB/totalH)})`,
+        density: layers.reduce((a,l)=>a + l.density*l.height, sol.density*newLayer.height) / totalH,
+        height: totalH,
+        purity: 0.15,
+        solIdx: -1,
+      };
+      session.cup.layers = [merged];
+    }
+  }
+
+  session.cup.pours.push({
+    solIdx: sol.idx, speed, mixing: +mixing.toFixed(3),
+    densityDiff: +densityDiff.toFixed(4),
+    when: new Date().toISOString(),
+  });
+  session.poured.push(sol.idx);
+  selectedTrayIdx = null;
+  saveSession();
+
+  // 애니메이션 → 그리기
+  animatePour(sol, () => {
+    drawTower();
+    renderTray();
+    updatePourBtn();
+    document.getElementById('btnFinish').disabled = false;
+    if (session.poured.length === MAX_SOLUTIONS) {
+      document.getElementById('towerStatus').textContent = '4개 용액을 모두 따랐습니다. “실험 종료”를 누르세요.';
+    } else {
+      document.getElementById('towerStatus').textContent = `${session.poured.length}/4 따름. 다음 용액을 선택하세요.`;
+    }
+  });
+}
+
+function parseHex(c) {
+  // accepts #rrggbb or rgb(...)
+  if (c.startsWith('#')) {
+    return {
+      r: parseInt(c.substr(1,2),16),
+      g: parseInt(c.substr(3,2),16),
+      b: parseInt(c.substr(5,2),16),
+    };
+  } else {
+    const m = c.match(/rgb\((\d+),(\d+),(\d+)\)/);
+    return {r:+m[1], g:+m[2], b:+m[3]};
+  }
+}
+function blendColor(a, b, t) {
+  const A = parseHex(a), B = parseHex(b);
+  const r = Math.round(A.r*(1-t) + B.r*t);
+  const g = Math.round(A.g*(1-t) + B.g*t);
+  const bb= Math.round(A.b*(1-t) + B.b*t);
+  return `rgb(${r},${g},${bb})`;
+}
+
+// 따르는 애니메이션 (간단한 스트림)
+function animatePour(sol, done) {
+  const c = document.getElementById('towerCanvas');
+  const ctx = c.getContext('2d');
+  let t = 0;
+  const dur = 30;
+  function frame() {
+    drawTower(); // 베이스
+    // stream
+    ctx.fillStyle = hexToRgba(sol.color.rgb, .85);
+    const streamX = 60 + Math.random()*4;
+    const streamH = (t/dur) * 280;
+    ctx.fillRect(streamX, 30, 4, streamH);
+    t++;
+    if (t < dur) requestAnimationFrame(frame);
+    else done && done();
+  }
+  frame();
+}
+
+function drawTower() {
+  const c = document.getElementById('towerCanvas');
+  const ctx = c.getContext('2d');
+  const W=c.width, H=c.height;
+  ctx.clearRect(0,0,W,H);
+
+  // 받침
+  ctx.fillStyle='#1d2b3a';
+  ctx.fillRect(60, H-30, W-120, 14);
+
+  // 컵 외곽 (사다리꼴)
+  const cx=W/2, topW=180, botW=140, cupH=320, cupTopY=70;
+  const cupBotY = cupTopY + cupH;
+  ctx.strokeStyle='#1d2b3a'; ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(cx-topW/2, cupTopY);
+  ctx.lineTo(cx-botW/2, cupBotY);
+  ctx.lineTo(cx+botW/2, cupBotY);
+  ctx.lineTo(cx+topW/2, cupTopY);
+  ctx.stroke();
+
+  // 컵 내부 클리핑
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx-topW/2+3, cupTopY+1);
+  ctx.lineTo(cx-botW/2+3, cupBotY-2);
+  ctx.lineTo(cx+botW/2-3, cupBotY-2);
+  ctx.lineTo(cx+topW/2-3, cupTopY+1);
+  ctx.closePath();
+  ctx.clip();
+
+  // 레이어 그리기 (밀도 큰 = 아래 → 정렬은 이미 보장됨)
+  const layers = session.cup.layers;
+  const totalH = layers.reduce((a,l)=>a+l.height, 0);
+  if (totalH > 0) {
+    const maxFillH = cupH - 20;
+    const scale = Math.min(1, maxFillH / (totalH * 1.4));
+    let y = cupBotY - 4;
+    // 아래에서 위로
+    layers.forEach((l, i) => {
+      const h = l.height * scale * 1.4;
+      const yTop = y - h;
+      // 층 색
+      ctx.fillStyle = l.color;
+      ctx.fillRect(cx - 100, yTop, 200, h);
+      // 경계 그라데이션 (purity가 낮으면 인접과 흐려짐)
+      if (i < layers.length - 1) {
+        const upper = layers[i+1];
+        if (l.purity < 0.7 || upper.purity < 0.7) {
+          const grad = ctx.createLinearGradient(0, yTop-12, 0, yTop+12);
+          grad.addColorStop(0, hexToRgba(upper.color.startsWith('#')?upper.color:rgbToHex(upper.color), 0.6));
+          grad.addColorStop(1, hexToRgba(l.color.startsWith('#')?l.color:rgbToHex(l.color), 0.6));
+          ctx.fillStyle = grad;
+          ctx.fillRect(cx-100, yTop-10, 200, 20);
+        }
+      }
+      y = yTop;
+    });
+  }
+
+  ctx.restore();
+
+  // 라벨
+  ctx.fillStyle='#0a6166';
+  ctx.font="bold 14px 'Noto Serif KR'";
+  ctx.fillText('밀도 탑', 20, 28);
+}
+
+function rgbToHex(rgb) {
+  const m = rgb.match(/rgb\((\d+),(\d+),(\d+)\)/);
+  if (!m) return rgb;
+  const toHex = n => (+n).toString(16).padStart(2,'0');
+  return '#' + toHex(m[1]) + toHex(m[2]) + toHex(m[3]);
+}
+
+async function finishTower() {
+  if (session.poured.length < MAX_SOLUTIONS) {
+    const ok = await showModal('확인',
+      `아직 ${MAX_SOLUTIONS - session.poured.length}개의 용액을 따르지 않았습니다. 그래도 종료하고 제출하시겠습니까?`,
+      {cancel:true});
+    if (!ok) return;
+  } else {
+    const ok = await showModal('실험 종료 확인',
+      '실험을 종료하고 채점 결과를 제출합니다. <b>제출 후에는 수정할 수 없습니다.</b> 계속할까요?',
+      {cancel:true});
+    if (!ok) return;
+  }
+  await doSubmit();
+}
+
+// ============================================================
+//  채점 + 제출
+// ============================================================
+
+// 채점은 전적으로 서버(Edge Function)가 수행합니다.
+// (클라이언트 채점 함수는 보안을 위해 제거되었습니다.)
+
+let submitting = false;
+async function doSubmit() {
+  if (submitting) return;
+  submitting = true;
+
+  const thumbCanvas = document.getElementById('towerCanvas');
+  const thumb = thumbCanvas.toDataURL('image/png');
+
+  // 서버로는 "원입력값"만 보냅니다. 점수·밀도·시각은 서버가 직접 계산/기록합니다.
+  const payload = {
+    key: session.key,
+    solutions: session.solutions.map(s => ({
+      water: s.water, sugar: s.sugar,
+      temperature: s.temperature ?? 20,
+      color: s.color.id,
+    })),
+    pours: session.cup.pours.map(p => ({ solIdx: p.solIdx, speed: p.speed })),
+    thumbnail: thumb,
+  };
+
+  showModal('제출 중', '서버에서 채점하고 있습니다… 잠시만 기다리세요.');
+  let r;
+  try { r = await callApi('submit', payload); }
+  catch (e) { r = { error: '서버에 연결할 수 없습니다.' }; }
+  closeModal();
+
+  if (!r || !r.ok) {
+    submitting = false;
+    await showModal('제출 실패', (r && r.error) ? escapeHtml(r.error) : '결과 제출 중 오류가 발생했습니다. 다시 시도해주세요.');
+    return;
+  }
+
+  clearSession();
+  session.submitted = true;
+
+  // 결과 화면 — 서버가 돌려준 점수/근거 표시
+  document.getElementById('r-exp').textContent = r.score;
+  document.getElementById('r-exp2').textContent = r.score;
+  document.getElementById('r-exp-reason').textContent = r.reason || '';
+  document.getElementById('r-man-reason').textContent = r.processNote || '';
+  document.getElementById('r-sid').textContent = session.studentId;
+
+  const dst = document.getElementById('resultThumb');
+  if (dst) {
+    const dctx = dst.getContext('2d');
+    dctx.clearRect(0,0,dst.width,dst.height);
+    dctx.drawImage(thumbCanvas, 0, 0, dst.width, dst.height);
+  }
+
+  showScreen('result');
+}
+
+// ============================================================
+//  교사 대시보드 (서버 API · 비밀번호)
+// ============================================================
+let teacherConfig = { is_open:false, windows:[] };
+
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+function effScore(r){ return (r && r.adjusted_score != null) ? r.adjusted_score : (r ? r.experiment_score : null); }
+
+async function teacherLogin() {
+  const pw = document.getElementById('teacherPwInput').value;
+  const msg = document.getElementById('teacherLoginMsg');
+  msg.style.color = 'var(--bad)';
+  msg.textContent = '확인 중…';
+  let r;
+  try { r = await callApi('teacher_login', { password: pw }); }
+  catch(e){ msg.textContent = '서버에 연결할 수 없습니다.'; return; }
+  if (!r.ok) { msg.textContent = r.error || '비밀번호가 일치하지 않습니다.'; return; }
+  teacherPw = pw;
+  msg.textContent = '';
+  document.getElementById('teacherLogin').style.display = 'none';
+  document.getElementById('teacherPanel').style.display = '';
+  await loadConfig();
+  renderRoster();
+  renderTeacher();
+}
+
+async function loadConfig() {
+  teacherConfig = (await teacherGetConfig()) || { is_open:false, windows:[] };
+  if (!Array.isArray(teacherConfig.windows)) teacherConfig.windows = [];
+  document.getElementById('cfgIsOpen').checked = !!teacherConfig.is_open;
+  renderWindows();
+}
+
+function renderWindows() {
+  const tb = document.getElementById('windowsBody');
+  const ws = teacherConfig.windows || [];
+  const now = Date.now();
+  document.getElementById('cfgStatus').textContent =
+    teacherConfig.is_open ? '스위치 ON — 시간대 안에서 제출 허용' : '스위치 OFF — 일반 제출 차단(재응시 허가는 별도 동작)';
+  if (ws.length === 0) {
+    tb.innerHTML = `<tr><td colspan="2" style="text-align:center;color:#888;padding:14px">등록된 시간대가 없습니다. 아래에서 추가하세요.</td></tr>`;
+    return;
+  }
+  tb.innerHTML = '';
+  ws.forEach((w, i) => {
+    const s = new Date(w.start), e = new Date(w.end);
+    const live = (now >= s.getTime() && now <= e.getTime());
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td>${s.toLocaleString('ko-KR')} → ${e.toLocaleString('ko-KR')} ${live ? '<span class="badge exc">진행중</span>' : ''}</td>` +
+      `<td><button class="btn btn-secondary btn-small" onclick="deleteWindow(${i})">삭제</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+async function saveWindowConfig() {
+  teacherConfig.is_open = document.getElementById('cfgIsOpen').checked;
+  const ok = await teacherSetWindow({ is_open: teacherConfig.is_open, windows: teacherConfig.windows });
+  if (!ok) await showModal('오류','설정 저장에 실패했습니다.');
+  renderWindows();
+}
+
+async function addWindow() {
+  const sv = document.getElementById('newWinStart').value;
+  const ev = document.getElementById('newWinEnd').value;
+  if (!sv || !ev) { await showModal('확인','시작·종료 시각을 모두 입력하세요.'); return; }
+  const start = new Date(sv).toISOString();
+  const end = new Date(ev).toISOString();
+  if (new Date(end) <= new Date(start)) { await showModal('확인','종료 시각이 시작보다 빨라요.'); return; }
+  teacherConfig.windows.push({ start, end });
+  const ok = await teacherSetWindow({ windows: teacherConfig.windows });
+  if (!ok) { await showModal('오류','저장에 실패했습니다.'); return; }
+  document.getElementById('newWinStart').value = '';
+  document.getElementById('newWinEnd').value = '';
+  renderWindows();
+}
+
+async function deleteWindow(i) {
+  teacherConfig.windows.splice(i,1);
+  await teacherSetWindow({ windows: teacherConfig.windows });
+  renderWindows();
+}
+
+async function renderTeacher() {
+  if (!teacherPw) return;
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#888;padding:20px">불러오는 중…</td></tr>`;
+  let all = await teacherList();
+  const fc = document.getElementById('filterClass').value.trim();
+  const fn = document.getElementById('filterName').value.trim();
+  if (fc) all = all.filter(r => String(r.class) === fc);
+  if (fn) all = all.filter(r => (r.name||'').includes(fn));
+  all.sort((a,b)=> (a.class-b.class) || (a.number-b.number));
+
+  tbody.innerHTML = '';
+  if (all.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#888;padding:24px">제출된 결과가 없습니다.</td></tr>`;
+    return;
+  }
+  all.forEach(r => {
+    const es = effScore(r);
+    const adj = r.adjusted_score != null;
+    const dt = new Date(r.submitted_at);
+    const dtStr = `${dt.getMonth()+1}/${dt.getDate()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
+    const cls = es===5?'exc':es===3?'mid':'poor';
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td class="num">${dtStr}</td>` +
+      `<td class="num">${r.grade}</td><td class="num">${r.class}</td><td class="num">${r.number}</td>` +
+      `<td>${escapeHtml(r.name)}</td>` +
+      `<td><span class="badge ${cls}">${es}점</span><br>` +
+        `<select onchange="updateScore('${r.access_key}',this.value)">` +
+          [5,3,1].map(v=>`<option value="${v}" ${es===v?'selected':''}>${v}점</option>`).join('') +
+        `</select></td>` +
+      `<td class="num"><b>${es}</b>/5${adj?' <span style="font-size:10px;color:var(--coral)">(수정)</span>':''}</td>` +
+      `<td>${r.thumbnail?`<img src="${r.thumbnail}" style="width:64px;border:1px solid var(--line);border-radius:6px;cursor:zoom-in" onclick="this.style.width=this.style.width==='64px'?'240px':'64px'">`:'-'}</td>` +
+      `<td style="max-width:300px;font-size:11.5px;line-height:1.55">` +
+        `<div style="margin-bottom:4px"><b>밀도탑:</b> ${escapeHtml(r.experiment_reason||'')}</div>` +
+        `<div style="color:var(--ink-soft)"><b>진단:</b> ${escapeHtml(r.process_note||'-')}</div></td>` +
+      `<td><button class="btn btn-secondary btn-small" onclick="deleteRecord('${r.access_key}','${escapeHtml(r.name)}')">삭제</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function updateScore(key, val) {
+  await teacherAdjust(key, +val);
+  renderTeacher(); renderRoster();
+}
+
+async function deleteRecord(key, name) {
+  const ok = await showModal('삭제 확인', `<b>${escapeHtml(name)}</b> 학생의 제출 기록을 삭제할까요?<br>삭제하면 이 학생은 (시간창 또는 재응시 허가 범위 안에서) 다시 응시할 수 있게 됩니다.`, {cancel:true});
+  if (!ok) return;
+  await teacherDelete(key);
+  renderTeacher(); renderRoster();
+}
+
+async function clearAll() {
+  const ok = await showModal('전체 삭제', `<b>모든</b> 제출 결과를 삭제할까요? 되돌릴 수 없습니다.`, {cancel:true});
+  if (!ok) return;
+  await teacherDeleteAll();
+  renderTeacher(); renderRoster();
+}
+
+async function exportCSV() {
+  const all = await teacherList();
+  if (all.length === 0) { showModal('내보내기','내보낼 데이터가 없습니다.'); return; }
+  const rows = [['제출시각(서버)','학년','반','번호','이름','밀도탑(자동)/5','최종점수/5','수정여부','채점 근거','실험과정 진단(참고)']];
+  all.forEach(r => {
+    rows.push([ r.submitted_at, r.grade, r.class, r.number, r.name,
+      r.experiment_score, effScore(r), (r.adjusted_score!=null?'수정됨':''),
+      r.experiment_reason, r.process_note || '' ]);
+  });
+  const csv = rows.map(row => row.map(cell => {
+    const s = String(cell ?? '');
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(',')).join('\n');
+  const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `밀도탑_평가결과_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ── 명단 · 제출현황 · 재응시 ──
+async function renderRoster() {
+  if (!teacherPw) return;
+  const tbody = document.getElementById('rosterBody');
+  const summary = document.getElementById('rosterSummary');
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#888;padding:16px">불러오는 중…</td></tr>`;
+  let list = await teacherRoster();
+  const fc = document.getElementById('rosterFilterClass').value.trim();
+  if (fc) list = list.filter(s => String(s.class) === fc);
+  list.sort((a,b)=> (a.grade-b.grade) || (a.class-b.class) || (a.number-b.number));
+
+  tbody.innerHTML = '';
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#888;padding:20px">명단이 비어 있습니다. roster 테이블에 학생을 넣으세요.</td></tr>`;
+    summary.textContent = ''; return;
+  }
+  let submitted = 0;
+  const now = Date.now();
+  list.forEach(s => {
+    if (s.submitted) submitted++;
+    const es = s.result ? (s.result.adjusted_score!=null ? s.result.adjusted_score : s.result.experiment_score) : null;
+    const makeupLive = s.makeup_until && now <= new Date(s.makeup_until).getTime();
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td class="num">${s.grade}</td><td class="num">${s.class}</td><td class="num">${s.number}</td>` +
+      `<td>${escapeHtml(s.name)}</td>` +
+      `<td>${s.submitted?'<span class="badge exc">제출함</span>':'<span class="badge poor">미제출</span>'}</td>` +
+      `<td class="num">${es!=null?`<b>${es}</b>/5`:'-'}</td>` +
+      `<td>${s.submitted
+        ? '<span style="font-size:11px;color:var(--ink-soft)">제출 완료</span>'
+        : (makeupLive
+            ? `<span class="badge mid">~${new Date(s.makeup_until).toLocaleString('ko-KR')}</span> <button class="btn btn-secondary btn-small" onclick="cancelMakeup('${s.access_key}')">취소</button>`
+            : `<button class="btn btn-small" onclick="grantMakeup('${s.access_key}','${escapeHtml(s.name)}')">재응시 허가</button>`)}</td>`;
+    tbody.appendChild(tr);
+  });
+  summary.textContent = `명단 ${list.length}명 중 제출 ${submitted}명 · 미제출 ${list.length - submitted}명`;
+}
+
+async function grantMakeup(key, name) {
+  const body = `<b>${escapeHtml(name)}</b> 학생의 재응시 <b>마감 시각</b>을 정하세요.<br>이 시각까지는 닫힌 시간에도 <b>이 학생만</b> 응시할 수 있습니다.<br><br>` +
+    `<input type="datetime-local" id="makeupInput" style="width:100%;padding:8px;border:1px solid var(--line);border-radius:8px">`;
+  const ok = await showModal('재응시 허가', body, {cancel:true});
+  if (!ok) return;
+  const el = document.getElementById('makeupInput');
+  const v = el ? el.value : '';
+  if (!v) { await showModal('확인','마감 시각을 입력하세요.'); return; }
+  await teacherGrantMakeup(key, new Date(v).toISOString());
+  renderRoster();
+}
+async function cancelMakeup(key) {
+  await teacherGrantMakeup(key, null);
+  renderRoster();
+}
+
+// ============================================================
+//  라우팅 + 초기화
+// ============================================================
+function handleRoute() {
+  if (location.hash === '#teacher') {
+    showScreen('teacher');
+    // 로그인 상태에 따라 게이트 표시
+    document.getElementById('teacherLogin').style.display = teacherPw ? 'none' : '';
+    document.getElementById('teacherPanel').style.display = teacherPw ? '' : 'none';
+    if (teacherPw) { loadConfig(); renderRoster(); renderTeacher(); }
+    else { const i = document.getElementById('teacherPwInput'); if (i) i.focus(); }
+  } else if (!session) {
+    showScreen('intro');
+  }
+}
+window.addEventListener('hashchange', handleRoute);
+
+(function init(){
+  updateDbPill();
+  // 진행 중이던 세션 복구
+  const raw = localStorage.getItem(STORAGE_SESSION);
+  if (raw) {
+    try {
+      const s = JSON.parse(raw);
+      if (s && s.studentId && !s.submitted) {
+        session = s;
+        document.getElementById('sessionStudent').innerHTML =
+          `<b>${s.student.grade}학년 ${s.student.class}반 ${s.student.number}번 ${s.student.name}</b> 학생 (이전 세션 복구됨) `;
+        if (s.solutions.length < MAX_SOLUTIONS) {
+          setupPrepareScreen();
+          showScreen('prepare');
+        } else {
+          // 용액 4개 완성 후에는 모두 tower 화면 (아직 안 따랐거나 일부 따른 상태)
+          setupTowerScreen();
+          showScreen('tower');
+        }
+      }
+    } catch(e){}
+  }
+  handleRoute();
+})();
+</script>
+</body>
+</html>
